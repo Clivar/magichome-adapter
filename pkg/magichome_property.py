@@ -20,7 +20,7 @@ class MagicHomeBulbProperty(Property):
 
     def set_value(self, value):
         """
-        Set the current value of the property. 
+        Set the current value of the property.
 
         value -- the value to set
         """
