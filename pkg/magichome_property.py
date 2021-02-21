@@ -1,7 +1,5 @@
 """Magic Home adapter for WebThings Gateway."""
-
 from gateway_addon import Property
-
 from .util import hex_to_rgb
 
 
@@ -26,7 +24,6 @@ class MagicHomeBulbProperty(Property):
 
         value -- the value to set
         """
-
         if self.name == 'on':
             if value:
                 self.device.turnOn()
