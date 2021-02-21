@@ -1,10 +1,7 @@
 """Magic Home adapter for WebThings Gateway."""
 
-from gateway_addon import Device, device
+from gateway_addon import Device
 from flux_led import WifiLedBulb
-
-import threading
-import time
 
 from .magichome_property import MagicHomeBulbProperty
 from .util import rgb_to_hex

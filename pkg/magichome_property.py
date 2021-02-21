@@ -1,6 +1,5 @@
 """Magic Home adapter for WebThings Gateway."""
 
-from flux_led import WifiLedBulb
 from gateway_addon import Property
 
 from .util import hex_to_rgb
@@ -28,18 +27,17 @@ class MagicHomeBulbProperty(Property):
         value -- the value to set
         """
 
-        try:
-            if self.name == 'on':
-                if value:
-                    self.device.turnOn()
-                else:
-                    self.device.turnOff()
-            elif self.name == 'color':
-                self.device.setRgb(*hex_to_rgb(value))
-            elif self.name == 'brightness':
-                self.device.setRgb(*self.device.getRgb(), brightness=value)
+        if self.name == 'on':
+            if value:
+                self.device.turnOn()
             else:
-                return
+                self.device.turnOff()
+        elif self.name == 'color':
+            self.device.setRgb(*hex_to_rgb(value))
+        elif self.name == 'brightness':
+            self.device.setRgb(*self.device.getRgb(), brightness=value)
+        else:
+            return
 
         self.set_cached_value(value)
-        self.device.notify_property_changed(self)
+        # self.device.notify_property_changed(self)

@@ -1,9 +1,4 @@
-from flux_led import BulbScanner, WifiLedBulb
-import socket
-import time
-import sys
-import datetime
-import threading
+from flux_led import WifiLedBulb
 
 
 def main():
