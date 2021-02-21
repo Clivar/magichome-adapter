@@ -26,15 +26,14 @@ class MagicHomeBulbProperty(Property):
         """
         if self.name == 'on':
             if value:
-                self.device.turnOn()
+                self.device.dev.turnOn()
             else:
-                self.device.turnOff()
+                self.device.dev.turnOff()
         elif self.name == 'color':
-            self.device.setRgb(*hex_to_rgb(value))
+            self.device.dev.setRgb(*hex_to_rgb(value))
         elif self.name == 'brightness':
-            self.device.setRgb(*self.device.getRgb(), brightness=value)
+            self.device.dev.setRgb(*self.device.dev.getRgb(), brightness=value)
         else:
             return
-
         self.set_cached_value(value)
-        # self.device.notify_property_changed(self)
+        self.device.notify_property_changed(self)

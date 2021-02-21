@@ -22,7 +22,7 @@ class MagicHomeBulb(Device):
                         adapter,
                         _id)
         self._type.extend(['OnOffSwitch', 'Light'])
-
+        self.dev = dev
         if isinstance(dev, WifiLedBulb):
             if dev.mode == 'color':
                 self.properties['color'] = MagicHomeBulbProperty(
@@ -33,7 +33,7 @@ class MagicHomeBulb(Device):
                         'title': 'Color',
                         'type': 'string',
                     },
-                    rgb_to_hex(dev.getRgb())
+                    rgb_to_hex(*dev.getRgb())
                 )
             if dev.mode == 'ww':
                 self.properties['warmwhite'] = MagicHomeBulbProperty(

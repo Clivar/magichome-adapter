@@ -53,7 +53,7 @@ class MagicHomeAdapter(Adapter):
 
                 # connect to network
                 sock.sendto('HF-A11ASSISTHREAD'.encode('ascii'),
-                            (self.ip, self.DISCOVERY_PORT))
+                            (address, 48899))
                 data, addr = sock.recvfrom(1024)
                 data = data.decode('ascii')
                 socketip, socketmac, socketmodel = data.split(',')
@@ -81,7 +81,7 @@ class MagicHomeAdapter(Adapter):
 
         self._add_from_config()
         scanner = BulbScanner()
-        for device in scanner.scan(timeout=min(timeout, _TIMEOUT)).values():
+        for device in scanner.scan(timeout=min(timeout, _TIMEOUT)):
             if not self.pairing:
                 break
 
