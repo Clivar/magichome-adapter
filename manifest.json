@@ -1,0 +1,38 @@
+{
+  "author": "Clivar",
+  "description": "Magic Home bulb adapter plugin for WebThings Gateway",
+  "gateway_specific_settings": {
+    "webthings": {
+      "exec": "python3 {path}/main.py",
+      "primary_type": "adapter",
+      "strict_max_version": "*",
+      "strict_min_version": "0.10.0"
+    }
+  },
+  "homepage_url": "https://github.com/Clivar/magichome-adapter",
+  "id": "magichome-adapter",
+  "license": "MPL-2.0",
+  "manifest_version": 1,
+  "name": "Magic Home",
+  "options": {
+    "default": {
+      "addresses": []
+    },
+    "schema": {
+      "type": "object",
+      "required": [
+        "addresses"
+      ],
+      "properties": {
+        "addresses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "short_name": "Magic Home",
+  "version": "0.0.1"
+}
