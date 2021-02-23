@@ -30,7 +30,8 @@ class MagicHomeBulbProperty(Property):
             else:
                 self.device.dev.turnOff()
         elif self.name == 'color':
-            self.device.dev.setRgb(*hex_to_rgb(value))
+            self.device.dev.setRgb(
+                *hex_to_rgb(value), brightness=self.device.dev.brightness)
         elif self.name == 'brightness':
             self.device.dev.setRgb(*self.device.dev.getRgb(), brightness=value)
         else:
