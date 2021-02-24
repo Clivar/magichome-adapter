@@ -24,17 +24,47 @@ class MagicHomeBulbProperty(Property):
 
         value -- the value to set
         """
-        if self.name == 'on':
-            if value:
-                self.device.dev.turnOn()
+        try:
+            if self.name == 'on':
+                if value:
+                    self.device.dev.turnOn()
+                else:
+                    self.device.dev.turnOff()
+            elif self.name == 'color':
+                self.device.dev.setRgb(
+                    *hex_to_rgb(value), brightness=self.device.brightness)
+            elif self.name == 'brightness':
+                self.device.dev.setRgb(
+                    *self.device.dev.getRgb(), brightness=value)
+            elif self.name == 'coldwhite':
+                self.device.dev.setColdWhite(value)
+            elif self.name == 'warmwhite':
+                self.device.dev.setWarmWhite(value)
             else:
-                self.device.dev.turnOff()
-        elif self.name == 'color':
-            self.device.dev.setRgb(
-                *hex_to_rgb(value), brightness=self.device.dev.brightness)
-        elif self.name == 'brightness':
-            self.device.dev.setRgb(*self.device.dev.getRgb(), brightness=value)
-        else:
+                return
+        except (OSError, UnboundLocalError):
             return
+
         self.set_cached_value(value)
         self.device.notify_property_changed(self)
+
+    def update(self):
+        """
+        Update the current value, if necessary.
+        """
+        if self.name == 'on':
+            value = self.device.is_on
+        elif self.name == 'color':
+            value = self.device.color
+        elif self.name == 'brightness':
+            value = self.device.brightness
+        elif self.name == 'coldwhite':
+            value = self.device.cold_white
+        elif self.name == 'warmwhite':
+            value = self.device.warm_white
+        else:
+            return
+
+        if value != self.value:
+            self.set_cached_value(value)
+            self.device.notify_property_changed(self)

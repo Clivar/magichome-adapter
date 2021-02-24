@@ -2,9 +2,13 @@
 
 from gateway_addon import Device
 from flux_led import WifiLedBulb
+import threading
+import time
 
 from .magichome_property import MagicHomeBulbProperty
 from .util import rgb_to_hex
+
+_POLL_INTERVAL = 5
 
 
 class MagicHomeBulb(Device):
@@ -23,6 +27,17 @@ class MagicHomeBulb(Device):
                         _id)
         self._type.extend(['OnOffSwitch', 'Light'])
         self.dev = dev
+
+        try:
+            self.dev.connect(2)
+            self.dev.update_state()
+        except (OSError, UnboundLocalError):
+            pass
+
+        t = threading.Thread(target=self.poll)
+        t.daemon = True
+        t.start()
+
         if isinstance(dev, WifiLedBulb):
             if dev.mode == 'color':
                 self.properties['color'] = MagicHomeBulbProperty(
@@ -33,34 +48,35 @@ class MagicHomeBulb(Device):
                         'title': 'Color',
                         'type': 'string',
                     },
-                    rgb_to_hex(*dev.getRgb())
+                    self.color
                 )
                 if dev.rgbwcapable:
-                    self.properties['warmWhite'] = MagicHomeBulbProperty(
+                    self.properties['warmwhite'] = MagicHomeBulbProperty(
                         self,
-                        'warmWhite',
+                        'warmwhite',
                         {
                             '@type': 'LevelProperty',
                             'title': 'Warm white',
                             'type': 'integer',
                             'unit': 'percent',
                             'minimum': 0,
-                            'maximum': 255
+                            'maximum': 100
                         },
-                        dev.warm_white
+                        self.warm_white
                     )
                     if dev.protocol == "LEDENET":
-                        self.properties['coldWhite'] = MagicHomeBulbProperty(
+                        self.properties['coldwhite'] = MagicHomeBulbProperty(
                             self,
-                            'coldWhite',
+                            'coldwhite',
                             {
                                 '@type': 'LevelProperty',
                                 'title': 'Cold white',
                                 'type': 'integer',
+                                'unit': 'percent',
                                 'minimum': 0,
-                                'maximum': 255
+                                'maximum': 100
                             },
-                            dev.cold_white
+                            self.cold_white
                         )
                 else:
                     self.properties['brightness'] = MagicHomeBulbProperty(
@@ -74,7 +90,7 @@ class MagicHomeBulb(Device):
                             'minimum': 0,
                             'maximum': 100
                         },
-                        dev.brightness
+                        self.brightness
                     )
             if dev.mode == 'ww':
                 self.properties['warmwhite'] = MagicHomeBulbProperty(
@@ -82,12 +98,13 @@ class MagicHomeBulb(Device):
                     'warmwhite',
                     {
                         '@type': 'LevelProperty',
-                        'title': 'WarmWhite',
+                        'title': 'Warm white',
                         'type': 'integer',
+                        'unit': 'percent',
                         'minimum': 0,
-                        'maximum': 255
+                        'maximum': 100
                     },
-                    dev.warm_white
+                    self.warm_white
                 )
             self.properties['on'] = MagicHomeBulbProperty(
                 self,
@@ -97,5 +114,38 @@ class MagicHomeBulb(Device):
                     'title': 'On/Off',
                     'type': 'boolean',
                 },
-                dev.is_on
+                self.is_on
             )
+
+    def poll(self):
+        """Poll the device for changes."""
+        while True:
+            time.sleep(_POLL_INTERVAL)
+            try:
+                self.dev.connect(2)
+                self.dev.update_state()
+            except (OSError, UnboundLocalError):
+                continue
+
+            for prop in self.properties.values():
+                prop.update()
+
+    @property
+    def is_on(self):
+        return self.dev.is_on
+
+    @property
+    def brightness(self):
+        return self.dev.brightness
+
+    @property
+    def warmwhite(self):
+        return self.dev.warm_white / 255 * 100
+
+    @property
+    def coldwhite(self):
+        return self.dev.cold_white / 255 * 100
+
+    @property
+    def color(self):
+        return rgb_to_hex(*self.dev.getRgb())
