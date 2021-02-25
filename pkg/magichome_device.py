@@ -139,11 +139,11 @@ class MagicHomeBulb(Device):
         return self.dev.brightness
 
     @property
-    def warmwhite(self):
+    def warm_white(self):
         return self.dev.warm_white / 255 * 100
 
     @property
-    def coldwhite(self):
+    def cold_white(self):
         return self.dev.cold_white / 255 * 100
 
     @property
