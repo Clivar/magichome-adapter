@@ -134,7 +134,7 @@ class MagicHomeBulb(Device):
         """
         if not self.supports_brightness:
             return None
-        return self.dev.brightness
+        return byteToPercent(self.dev.brightness)
 
     @property
     def warm_white(self):
