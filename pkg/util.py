@@ -15,3 +15,24 @@ def hex_to_rgb(hex):
     """
     hex = hex.lstrip('#')
     return tuple(int(hex[i:i + 2], 16) / 255 for i in range(0, 6, 2))
+
+
+def byteToPercent(byte):
+    if not byte:
+        return None
+
+    if byte > 255:
+        byte = 255
+    if byte < 0:
+        byte = 0
+    return int((byte * 100)/255)
+
+
+def percentToByte(percent):
+    if not percent:
+        return None
+    if percent > 100:
+        percent = 100
+    if percent < 0:
+        percent = 0
+    return int((percent * 255)/100)
