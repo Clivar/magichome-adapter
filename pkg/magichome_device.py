@@ -6,7 +6,7 @@ import threading
 import time
 
 from .magichome_property import MagicHomeBulbProperty
-from .util import byteToPercent, rgb_to_hex
+from .util import byteToPercent, percentToByte, rgb_to_hex
 
 _POLL_INTERVAL = 5
 
@@ -118,6 +118,26 @@ class MagicHomeBulb(Device):
 
             for prop in self.properties.values():
                 prop.update()
+
+    def setRgbw(self, r=None, g=None, b=None,
+                warm_white=None,
+                cold_white=None,
+                brightness=None):
+        """Sets the color values."""
+        if not r and not g and not b:
+            (r, g, b) = self.dev.getRgb()
+        if not brightness:
+            brightness = self.brightness
+        if not warm_white:
+            warm_white = self.warm_white
+        if not cold_white:
+            cold_white = self.cold_white
+
+        self.dev.setRgbw(
+            r, g, b,
+            w=percentToByte(warm_white),
+            w2=percentToByte(cold_white),
+            brightness=percentToByte(brightness))
 
     @property
     def is_on(self):

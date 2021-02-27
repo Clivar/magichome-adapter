@@ -1,6 +1,6 @@
 """Magic Home adapter for WebThings Gateway."""
 from gateway_addon import Property
-from .util import hex_to_rgb, percentToByte
+from .util import hex_to_rgb
 
 
 class MagicHomeBulbProperty(Property):
@@ -31,31 +31,13 @@ class MagicHomeBulbProperty(Property):
                 else:
                     self.device.dev.turnOff()
             elif self.name == 'color':
-                if self.device.dev.rgbwcapable:
-                    self.device.dev.setRgbw(
-                        *hex_to_rgb(value),
-                        w=percentToByte(self.device.warm_white),
-                        w2=percentToByte(self.device.cold_white),
-                        brightness=percentToByte(self.device.brightness))
-                else:
-                    self.device.dev.setRgb(
-                        *hex_to_rgb(value),
-                        brightness=percentToByte(self.device.brightness))
+                self.device.setRgbw(*hex_to_rgb(value))
             elif self.name == 'brightness':
-                if self.device.dev.rgbwcapable:
-                    self.device.dev.setRgbw(
-                        *self.device.dev.getRgb(),
-                        w=percentToByte(self.device.warm_white),
-                        w2=percentToByte(self.device.cold_white),
-                        brightness=percentToByte(value))
-                else:
-                    self.device.dev.setRgb(
-                        *self.device.dev.getRgb(),
-                        brightness=percentToByte(value))
+                self.device.setRgbw(brightness=value)
             elif self.name == 'coldwhite':
-                self.device.dev.setColdWhite(value)
+                self.device.setRgbw(cold_white=value)
             elif self.name == 'warmwhite':
-                self.device.dev.setWarmWhite(value)
+                self.device.setRgbw(warm_white=value)
             else:
                 return
         except (OSError, UnboundLocalError):
