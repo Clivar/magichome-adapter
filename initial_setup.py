@@ -114,3 +114,13 @@ def configureWifi(ip, ssid, key):
     sock.sendto("AT+Z\r".encode('ascii'),
                 (ip, DISCOVERY_PORT))  # no return
     print("connect complete to \"%s\"" % ssid)
+
+
+def main():
+    devices = find_devices(bind_ip='')
+    for ip in devices:
+        configureWifi(ip, '<ssid>', '<pwd>')
+
+
+if __name__ == '__main__':
+    main()

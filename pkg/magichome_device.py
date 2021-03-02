@@ -43,6 +43,7 @@ class MagicHomeBulb(Device):
         t.start()
 
         if self.supports_color:
+            self._type.append('ColorControl')
             self.properties['color'] = MagicHomeBulbProperty(
                 self,
                 'color',
@@ -53,48 +54,37 @@ class MagicHomeBulb(Device):
                 },
                 self.color
             )
-        if self.supports_brightness:
-            self.properties['brightness'] = MagicHomeBulbProperty(
+        if self.supports_color_temperature:
+            if 'ColorControl' not in self._type:
+                self._type.append('ColorControl')
+
+            self.properties['colorTemperature'] = MagicHomeBulbProperty(
                 self,
-                'brightness',
+                'colorTemperature',
                 {
-                    '@type': 'BrightnessProperty',
-                    'title': 'Brightness',
+                    '@type': 'ColorTemperatureProperty',
+                    'title': 'Color Temperature',
                     'type': 'integer',
-                    'unit': 'percent',
-                    'minimum': 0,
-                    'maximum': 100
+                    'unit': 'kelvin',
+                    'minimum': 2700,
+                    'maximum': 6500
                 },
-                self.brightness
+                self.color_temperature
             )
-        if self.supports_warm_white:
-            self.properties['warmwhite'] = MagicHomeBulbProperty(
-                self,
-                'warmwhite',
-                {
-                    '@type': 'LevelProperty',
-                    'title': 'Warm white',
-                    'type': 'integer',
-                    'unit': 'percent',
-                    'minimum': 0,
-                    'maximum': 100
-                },
-                self.warm_white
-            )
-        if self.supports_cold_white:
-            self.properties['coldwhite'] = MagicHomeBulbProperty(
-                self,
-                'coldwhite',
-                {
-                    '@type': 'LevelProperty',
-                    'title': 'Cold white',
-                    'type': 'integer',
-                    'unit': 'percent',
-                    'minimum': 0,
-                    'maximum': 100
-                },
-                self.cold_white
-            )
+        self.properties['brightness'] = MagicHomeBulbProperty(
+            self,
+            'brightness',
+            {
+                '@type': 'BrightnessProperty',
+                'title': 'Brightness',
+                'type': 'integer',
+                'unit': 'percent',
+                'minimum': 0,
+                'maximum': 100
+            },
+            self.brightness
+        )
+
         self.properties['on'] = MagicHomeBulbProperty(
             self,
             'on',
@@ -119,25 +109,21 @@ class MagicHomeBulb(Device):
             for prop in self.properties.values():
                 prop.update()
 
-    def setRgbw(self, r=None, g=None, b=None,
-                warm_white=None,
-                cold_white=None,
-                brightness=None):
+    def setRgb(self, r=None, g=None, b=None,
+               brightness=None):
         """Sets the color values."""
         if not r and not g and not b:
             (r, g, b) = self.dev.getRgb()
         if not brightness:
             brightness = self.brightness
-        if not warm_white:
-            warm_white = self.warm_white
-        if not cold_white:
-            cold_white = self.cold_white
 
-        self.dev.setRgbw(
+        self.dev.setRgb(
             r, g, b,
-            w=percentToByte(warm_white),
-            w2=percentToByte(cold_white),
             brightness=percentToByte(brightness))
+
+    def setColorTemperature(self, temperature):
+        self.dev.setWhiteTemperature(
+            temperature, brightness=self.dev.brightness)
 
     @property
     def is_on(self):
@@ -152,27 +138,7 @@ class MagicHomeBulb(Device):
         """
         Returns the brightness in percent (0-100)
         """
-        if not self.supports_brightness:
-            return None
         return byteToPercent(self.dev.brightness)
-
-    @property
-    def warm_white(self):
-        """
-        Returns warm white in percent (0-100)
-        """
-        if not self.supports_warm_white:
-            return None
-        return byteToPercent(self.dev.warm_white)
-
-    @property
-    def cold_white(self):
-        """
-        Returns cold white in percent (0-100)
-        """
-        if not self.supports_cold_white:
-            return None
-        return byteToPercent(self.dev.cold_white)
 
     @property
     def color(self):
@@ -184,17 +150,17 @@ class MagicHomeBulb(Device):
         return rgb_to_hex(*self.dev.getRgb())
 
     @property
+    def color_temperature(self):
+        if not self.supports_color_temperature:
+            return None
+        return (1 -
+                (self.dev.warm_white*255/percentToByte(self.brightness)/255)
+                )*3800
+
+    @property
     def supports_color(self):
         return self.dev.mode == "color"
 
     @property
-    def supports_brightness(self):
-        return self.dev.mode != 'ww'
-
-    @property
-    def supports_warm_white(self):
-        return self.dev.mode == 'ww' or self.dev.rgbwcapable
-
-    @property
-    def supports_cold_white(self):
-        return self.dev.protocol == "LEDENET" and self.dev.rgbwcapable
+    def supports_color_temperature(self):
+        return self.dev.protocol == 'LEDENET'

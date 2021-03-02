@@ -31,13 +31,11 @@ class MagicHomeBulbProperty(Property):
                 else:
                     self.device.dev.turnOff()
             elif self.name == 'color':
-                self.device.setRgbw(*hex_to_rgb(value))
+                self.device.setRgb(*hex_to_rgb(value))
             elif self.name == 'brightness':
-                self.device.setRgbw(brightness=value)
-            elif self.name == 'coldwhite':
-                self.device.setRgbw(cold_white=value)
-            elif self.name == 'warmwhite':
-                self.device.setRgbw(warm_white=value)
+                self.device.setRgb(brightness=value)
+            elif self.name == 'colorTemperature':
+                self.device.setColorTemperature(value)
             else:
                 return
         except (OSError, UnboundLocalError):
@@ -56,10 +54,8 @@ class MagicHomeBulbProperty(Property):
             value = self.device.color
         elif self.name == 'brightness':
             value = self.device.brightness
-        elif self.name == 'coldwhite':
-            value = self.device.cold_white
-        elif self.name == 'warmwhite':
-            value = self.device.warm_white
+        elif self.name == 'colorTemperature':
+            value = self.device.color_temperature
         else:
             return
 
