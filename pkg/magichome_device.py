@@ -112,14 +112,18 @@ class MagicHomeBulb(Device):
     def setRgb(self, r=None, g=None, b=None,
                brightness=None):
         """Sets the color values."""
-        if not r and not g and not b:
-            (r, g, b) = self.dev.getRgb()
-        if not brightness:
-            brightness = self.brightness
+        if self.supports_color:
+            if not r and not g and not b:
+                (r, g, b) = self.dev.getRgb()
+            if not brightness:
+                brightness = self.brightness
 
-        self.dev.setRgb(
-            r, g, b,
-            brightness=percentToByte(brightness))
+            self.dev.setRgb(
+                r, g, b,
+                brightness=percentToByte(brightness))
+        else:
+            self.dev.setRgb(r=percentToByte(brightness),
+                            g=0, b=0, brightness=0)
 
     def setColorTemperature(self, temperature):
         self.dev.setWhiteTemperature(
@@ -138,7 +142,11 @@ class MagicHomeBulb(Device):
         """
         Returns the brightness in percent (0-100)
         """
-        return byteToPercent(self.dev.brightness)
+        if self.supports_color:
+            return byteToPercent(self.dev.brightness)
+        else:
+            (r, _, _) = self.dev.getRgb()
+            return byteToPercent(r)
 
     @property
     def color(self):
@@ -159,7 +167,9 @@ class MagicHomeBulb(Device):
 
     @property
     def supports_color(self):
-        return self.dev.mode == "color"
+        return (self.dev.mode == "color" and
+                not (self.dev.raw_state[1] == 0x21 or
+                     self.dev.raw_state[1] == 0x41))
 
     @property
     def supports_color_temperature(self):
