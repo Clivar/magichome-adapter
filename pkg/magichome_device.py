@@ -71,6 +71,22 @@ class MagicHomeBulb(Device):
                 },
                 self.color_temperature
             )
+        if self.supports_color and self.supports_color_temperature:
+            self.properties['colormode'] = MagicHomeBulbProperty(
+                self,
+                'colorMode',
+                {
+                    '@type': 'ColorModeProperty',
+                    'title': 'Color Mode',
+                    'type': 'integer',
+                    'enum': [
+                        'color',
+                        'temperature',
+                    ],
+                    'readOnly': False,
+                },
+                self.color_mode
+            )
         self.properties['brightness'] = MagicHomeBulbProperty(
             self,
             'brightness',
@@ -122,12 +138,22 @@ class MagicHomeBulb(Device):
                 r, g, b,
                 brightness=percentToByte(brightness))
         else:
-            self.dev.setRgb(r=percentToByte(brightness),
-                            g=0, b=0, brightness=0)
+            self.dev.setRgb(r=0, g=0, b=0, brightness=brightness)
 
     def setColorTemperature(self, temperature):
         self.dev.setWhiteTemperature(
             temperature, brightness=self.dev.brightness)
+
+    def setColorMode(self):
+        self.dev._determineMode
+
+    @property
+    def color_mode(self):
+        if self.dev.mode == "ww":
+            return "temperature"
+        if self.dev.mode == "color":
+            return "color"
+        return None
 
     @property
     def is_on(self):
@@ -145,8 +171,7 @@ class MagicHomeBulb(Device):
         if self.supports_color:
             return byteToPercent(self.dev.brightness)
         else:
-            (r, _, _) = self.dev.getRgb()
-            return byteToPercent(r)
+            return self.dev.brightness
 
     @property
     def color(self):
@@ -161,16 +186,21 @@ class MagicHomeBulb(Device):
     def color_temperature(self):
         if not self.supports_color_temperature:
             return None
+        if not self.brightness:
+            return 2700
         return (1 -
                 (self.dev.warm_white*255/percentToByte(self.brightness)/255)
                 )*3800
 
     @property
     def supports_color(self):
-        return (self.dev.mode == "color" and
-                not (self.dev.raw_state[1] == 0x21 or
-                     self.dev.raw_state[1] == 0x41))
+        return self.dev.mode == "color" and not self.is_single_color
 
-    @property
+    @ property
     def supports_color_temperature(self):
-        return self.dev.protocol == 'LEDENET'
+        return self.dev.rgbwcapable and not self.is_single_color
+
+    @ property
+    def is_single_color(self):
+        return (self.dev.raw_state[1] == 0x21 or
+                self.dev.raw_state[1] == 0x41)

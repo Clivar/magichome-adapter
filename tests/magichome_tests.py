@@ -3,7 +3,7 @@ from flux_led import WifiLedBulb
 
 
 def main():
-    device = WifiLedBulb('10.10.21.100')
+    device = WifiLedBulb('<ip>')
     print(hex(device.raw_state[1]))
 
 

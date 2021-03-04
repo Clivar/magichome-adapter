@@ -19,7 +19,7 @@ def hex_to_rgb(hex):
 
 def byteToPercent(byte):
     if not byte:
-        return None
+        return 0
 
     if byte > 255:
         byte = 255
@@ -30,7 +30,7 @@ def byteToPercent(byte):
 
 def percentToByte(percent):
     if not percent:
-        return None
+        return 0
     if percent > 100:
         percent = 100
     if percent < 0:
