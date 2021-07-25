@@ -1,6 +1,5 @@
 """Magic Home adapter for WebThings Gateway."""
 
-from pkg.magichome_adapter import MagicHomeAdapter
 from os import path
 import functools
 import signal
@@ -9,6 +8,7 @@ import time
 
 sys.path.append(path.join(path.dirname(path.abspath(__file__)), 'lib'))
 
+from pkg.magichome_adapter import MagicHomeAdapter
 
 _DEBUG = True
 _ADAPTER = None
