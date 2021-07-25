@@ -8,7 +8,7 @@ import time
 
 sys.path.append(path.join(path.dirname(path.abspath(__file__)), 'lib'))
 
-from pkg.magichome_adapter import MagicHomeAdapter
+from pkg.magichome_adapter import MagicHomeAdapter  # noqa
 
 _DEBUG = True
 _ADAPTER = None
