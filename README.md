@@ -2,19 +2,21 @@
 
 Magic Home bulb adapter for WebThings Gateway.
 
-## Initial configuration of your Magic Home device
-The initial 'pairing' of a device to your wifi network cannot be done with this adapter.
-Reason being that the gateway should in that case connect to the device's wifi network for a while.
+## Supported devices
+- RGB (not tested but should work)
+- RGBW (not tested but should work)
+- RGBWW (tested)
+- Single color (tested)
 
-However what could be done, is create an WebThings addon that allows gateways with wired connections 
-and an (unused) wifi connection to perform the pairing. This addon can then provide instructions to change the gateways settings to connect to the device's wifi network.
-Afterwards the addon will discover the device's ip and pair it to the user specified wifi network.
+## Getting started
+1. Link your device to your wifi network.  
+You can use the MagicHome app or use `initial_setup.py` (don't forget to edit the script with your ssid and password)
+2. Pair the device to your gateway.  
+If the device is in the same network (subnet) as the gateway, it will autodiscover (make sure multicast traffic is not filtered).  
+If the device is not in the same network. Add the device ip manually in settings.
+3. Done!
 
-For now: use `initial_setup.py` to perform the initial configuration manually.
-
-PLEASE NOTE: This should be NOT confused with the pairing process of the gateway. Devices are discovered as expected once they are on the same network(subnet) as the gateway.
-
-## Requirements
+## Development
 
 If you're running this add-on outside of the official gateway image for the Raspberry Pi, i.e. you're running on a development machine, you'll need to do the following (adapt as necessary for non-Ubuntu/Debian):
 
