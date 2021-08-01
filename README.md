@@ -6,6 +6,7 @@ Magic Home bulb adapter for WebThings Gateway.
 - RGB (not tested but should work)
 - RGBW (not tested but should work)
 - RGBWW (tested)
+- RGBCW (ongoing, not supported)
 - Single color (tested)
 
 ## Getting started
